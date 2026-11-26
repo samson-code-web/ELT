@@ -40,14 +40,29 @@ GH Archive (JSON.gz)
         - Executes `COPY INTO` from S3 Stage `@S3_STAGE/raw/github.parquet`
         - Uses `MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE` for Parquet mapping
 
-4. **Transform with dbt (`elt_project/`)**
-        - Model: `unnested_table` → `CLEANED_GITHUB_EVENT_TABLE`
-        - Unnests `repo` VARIANT column into:
-            - `repo_id`
-            - `name`
-            - `url`
-        - Filters to `WHERE public = TRUE`
-        - Source: `elt_source.RAW_GITHUB_EVENTS`
+4. ### Transform with dbt (`elt_project/`)
+
+**Model:** `unnested_table` → `CLEANED_GITHUB_EVENT_TABLE`
+**Materialization:** `table`
+
+Unnests the `repo` VARIANT column into:
+- `repo_id` — `repo:id::NUMBER(38,0)`
+- `name` — `repo:name::STRING`
+- `url` — `repo:url::STRING`
+
+**Final columns:**
+- `repo_id`
+- `name`
+- `url`
+- `created_at`
+- `public`
+
+**Transformations:**
+- Filters to `WHERE public = TRUE`
+- Deduplicates to 1 row per repo using `ROW_NUMBER() OVER (PARTITION BY repo_id ORDER BY created_at DESC)` and keeps only `rn = 1` (latest event per repo)
+
+**Source:** `elt_source.RAW_GITHUB_EVENTS`
+
 
 ## Tech Stack
 
