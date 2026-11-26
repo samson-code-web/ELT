@@ -1,0 +1,13 @@
+
+version: 2
+
+models:
+  - name: unesting_data
+    description: "gets id , name , and url of github repositories "
+
+sources:
+  - name: elt_source
+    database: TEST_DATABASE
+    schema: RAW
+    tables:
+      - name: RAW_GITHUB_EVENTS
