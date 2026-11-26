@@ -26,19 +26,10 @@ pull:
 
 deployments:
   - name: elt-flow
-    entrypoint: main.py:trigger_action
+    entrypoint: main.py:main_flow
     work_pool:
       name: elt-pool
     schedules:
-      - cron: "0 2 * * 1"
-        timezone: "America/Toronto"
-        active: true
-
-  - name: dbt-flow
-    entrypoint: main.py:dbt_orchestration_flow
-    work_pool:
-      name: elt-pool
-    schedules:
-      - cron: "0 3 * * 1"
+      - cron: "0 8 * * 1"
         timezone: "America/Toronto"
         active: true

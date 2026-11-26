@@ -3,7 +3,7 @@ version: 2
 
 models:
   - name: unnested_table
-    description: "gets id , name , and url of github repositories "
+    description: "unnesting id , name , and url from repo column"
 
 sources:
   - name: elt_source

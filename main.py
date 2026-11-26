@@ -1,4 +1,5 @@
 from prefect_dbt import PrefectDbtRunner , PrefectDbtSettings
+from set_up_snowflake import setting_up_snowflake
 from dump_in_aws_s3_bucket import send_to_bucket
 from extract_data import retrieve_data
 from prefect import flow , task
@@ -6,7 +7,6 @@ from datetime import datetime
 from pathlib import Path
 import logging
 
-from set_up_snowflake import setting_up_snowflake
 logger = logging.getLogger("elt")
 logger.setLevel(logging.INFO)
 logger.propagate = False
@@ -32,6 +32,11 @@ def uploading_file(parquet_file_buffer):
     logger.info("uploading step has started")
     return send_to_bucket(file=parquet_file_buffer)
 
+@task(retries=3, retry_delay_seconds=10)
+def snow_set_up():
+    logger.info("snow set up step has started")
+    return setting_up_snowflake()
+
 @task(retries=3, retry_delay_seconds=30)
 def execute_dbt_pipeline(project_dir: Path, profiles_dir: Path) -> None:
     settings = PrefectDbtSettings(
@@ -42,23 +47,27 @@ def execute_dbt_pipeline(project_dir: Path, profiles_dir: Path) -> None:
     runner.invoke(["deps"])
     runner.invoke(["build"])
 
+@flow(name="DBT-TRANSFORMATION-FLOW", log_prints=True)
+def dbt_orchestration_flow( project_dir: Path = Path(__file__).resolve().parent / 'elt_project', profiles_dir: Path = Path.home() / ".dbt") -> None:
+    logger.info(f"Starting dbt build for project at {project_dir}...")
+    execute_dbt_pipeline(project_dir=project_dir, profiles_dir=profiles_dir)
+    logger.info("dbt build completed successfully.")
+
 @flow(name='EXTRACTING-LOADING-FLOW')
-def trigger_action() -> None:
+def main_flow() -> None:
     initial_date = datetime(2026, 1, 1, 0)
-    final_date = datetime(2026, 1, 1,24)
+    final_date = datetime(2026, 1, 2,0)
 
     path = get_file(initial_date=initial_date, final_date=final_date)
 
+    if path is None:
+        logger.error("Path is None")
+        return
+
     uploading_file(path)
 
-    setting_up_snowflake()
+    snow_set_up()
 
-@flow(name="DBT-TRANSFORMATION-FLOW", log_prints=True)
-def dbt_orchestration_flow( project_dir: Path = Path(__file__).resolve().parent / 'elt_project', profiles_dir: Path = Path.home() / ".dbt") -> None:
-    try:
-        logger.info(f"Starting dbt build for project at {project_dir}...")
-        execute_dbt_pipeline(project_dir=project_dir, profiles_dir=profiles_dir)
-        logger.info("dbt build completed successfully.")
-    except Exception as e:
-        logger.error(e)
+    dbt_orchestration_flow(project_dir= Path(__file__).resolve().parent / 'elt_project', profiles_dir= Path.home() / ".dbt")
+
 

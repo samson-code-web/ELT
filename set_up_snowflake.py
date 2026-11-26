@@ -1,30 +1,29 @@
-import logging
-from pathlib import Path
-import snowflake.connector as sf
-from dbt.config.profile import Profile
-from dbt.config.renderer import ProfileRenderer
 from dbt.clients.yaml_helper import load_yaml_text
-
+from dbt.config.renderer import ProfileRenderer
+from dbt.config.profile import Profile
 from dbt.flags import set_from_args
+import snowflake.connector as sf
 from argparse import Namespace
+from pathlib import Path
+import logging
 
-logger = logging.getLogger(f'elt{__file__}')
-
-set_from_args(Namespace(), None)
-
-profiles_path = Path.home() / ".dbt" / "profiles.yml"
-
-raw_profiles = load_yaml_text(profiles_path.read_text(encoding="utf-8"))
-
-profile = Profile.from_raw_profiles(
-    raw_profiles=raw_profiles,
-    profile_name="elt_project",
-    renderer=ProfileRenderer()
-)
-
-creds = profile.credentials
+logger = logging.getLogger(f'elt{__name__}')
 
 def setting_up_snowflake():
+    set_from_args(Namespace(), None)
+
+    profiles_path = Path.home() / ".dbt" / "profiles.yml"
+
+    raw_profiles = load_yaml_text(profiles_path.read_text(encoding="utf-8"))
+
+    profile = Profile.from_raw_profiles(
+        raw_profiles=raw_profiles,
+        profile_name="elt_project",
+        renderer=ProfileRenderer()
+    )
+
+    creds = profile.credentials
+
     with sf.connect(
     user=creds.user,
     password=creds.password,
@@ -47,7 +46,7 @@ def setting_up_snowflake():
 
             logger.info("trying to create the RAW_GITHUB_EVENTS table...")
             cursor.execute('''
-                CREATE OR REPLACE TABLE RAW_GITHUB_EVENTS (
+                CREATE TABLE IF NOT EXISTS RAW_GITHUB_EVENTS (
                     id VARCHAR,
                     type VARCHAR,
                     actor VARIANT,
