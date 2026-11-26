@@ -1,9 +1,24 @@
-
 version: 2
 
 models:
   - name: unnested_table
-    description: "unnesting id , name , and url from repo column"
+    description: "Deduplicated public GitHub repositories unnested from raw events"
+    columns:
+      - name: repo_id
+        description: "Unique GitHub repository ID"
+        data_tests:
+          - unique
+          - not_null
+      - name: name
+        description: "Full repository name (owner/repo)"
+        data_tests:
+          - not_null
+      - name: url
+        description: "GitHub API URL for the repository"
+      - name: created_at
+        description: "Timestamp of the most recent event captured for this repository"
+      - name: public
+        description: "Boolean flag indicating public visibility"
 
 sources:
   - name: elt_source
