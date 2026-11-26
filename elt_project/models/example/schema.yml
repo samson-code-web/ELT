@@ -2,7 +2,7 @@
 version: 2
 
 models:
-  - name: unesting_data
+  - name: unnested_table
     description: "gets id , name , and url of github repositories "
 
 sources:
