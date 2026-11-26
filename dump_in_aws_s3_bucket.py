@@ -6,8 +6,8 @@ import logging
 
 logger = logging.getLogger(f"elt.{__file__}")
 config = TransferConfig(
-    multipart_chunksize= 500 * 1024 * 1024,
-    multipart_threshold= 1024 * 1024 * 1024,
+    multipart_chunksize= 34 * 1024 * 1024,
+    multipart_threshold= 64 * 1024 * 1024,
     max_concurrency=5,
     use_threads=True
     )

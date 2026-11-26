@@ -54,7 +54,7 @@ def trigger_action() -> None:
     setting_up_snowflake()
 
 @flow(name="DBT-TRANSFORMATION-FLOW", log_prints=True)
-def dbt_orchestration_flow( project_dir: Path = Path(__file__).resolve().parent / 'elt_project', profiles_dir: Path = Path("/home/samson/.dbt/").resolve()) -> None:
+def dbt_orchestration_flow( project_dir: Path = Path(__file__).resolve().parent / 'elt_project', profiles_dir: Path = Path.home() / ".dbt") -> None:
     try:
         logger.info(f"Starting dbt build for project at {project_dir}...")
         execute_dbt_pipeline(project_dir=project_dir, profiles_dir=profiles_dir)
