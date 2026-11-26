@@ -24,7 +24,7 @@ def retrieve_data(start_date: datetime, end_date: datetime) -> io.BytesIO | None
                 with client.stream("GET", url) as response:
                     response.raise_for_status()
                     raw_buffer = io.BytesIO()
-                    for chunk in response.iter_raw(chunk_size=1024 * 1024):  # 1 MB chunks
+                    for chunk in response.iter_raw(chunk_size=100 * 1024 * 1024):
                         raw_buffer.write(chunk)
 
                 raw_buffer.seek(0)

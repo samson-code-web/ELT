@@ -32,7 +32,7 @@ def uploading_file(parquet_file_buffer):
     logger.info("uploading step has started")
     return send_to_bucket(file=parquet_file_buffer)
 
-@task(name="run-dbt-commands", retries=2, retry_delay_seconds=30)
+@task(retries=3, retry_delay_seconds=30)
 def execute_dbt_pipeline(project_dir: Path, profiles_dir: Path) -> None:
     settings = PrefectDbtSettings(
         project_dir=project_dir,
