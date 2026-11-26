@@ -40,7 +40,7 @@ GH Archive (JSON.gz)
         - Executes `COPY INTO` from S3 Stage `@S3_STAGE/raw/github.parquet`
         - Uses `MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE` for Parquet mapping
 
-4. ### Transform with dbt (`elt_project/`)
+4. **Transform with dbt (`elt_project/`)**
 
 **Model:** `unnested_table` → `CLEANED_GITHUB_EVENT_TABLE`
 **Materialization:** `table`
