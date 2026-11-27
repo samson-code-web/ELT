@@ -12,7 +12,7 @@ WITH ranked_events AS (
             ORDER BY created_at DESC
         ) AS rn
     FROM {{ source('elt_source', 'RAW_GITHUB_EVENTS') }}
-    WHERE public = TRUE
+    WHERE public = TRUE AND name IS NOT NULL AND repo_id IS NOT NULL
 )
 
 SELECT
