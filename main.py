@@ -56,7 +56,7 @@ def dbt_orchestration_flow( project_dir: Path = Path(__file__).resolve().parent 
 @flow(name='EXTRACTING-LOADING-FLOW')
 def main_flow() -> None:
     initial_date = datetime(2026, 1, 1, 0)
-    final_date = datetime(2026, 1, 2,0)
+    final_date = datetime(2026, 1, 1,5)
 
     path = get_file(initial_date=initial_date, final_date=final_date)
 
