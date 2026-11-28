@@ -60,10 +60,6 @@ def main_flow() -> None:
 
     path = get_file(initial_date=initial_date, final_date=final_date)
 
-    if path is None:
-        logger.error("Path is None")
-        return
-
     uploading_file(path)
 
     snow_set_up()
